@@ -1,0 +1,88 @@
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+  margin: 0;
+  max-width: none;
+  padding: 0;
+  height: 100vh;
+  box-sizing: border-box;
+  padding-top: 40px;
+}
+
+#drag-region {
+  -webkit-app-region: drag;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  width: 100%;
+  z-index: 1;
+}
+
+#controls {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  padding: 12px;
+  z-index: 2;
+}
+
+#controls button {
+  -webkit-app-region: no-drag;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  width: 72px; /* default smaller for side buttons */
+  height: 72px;
+}
+
+#controls img {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 56px; /* default smaller icon */
+  height: auto;
+  -webkit-user-drag: none;
+}
+
+/* Disable selection/highlight and focus ring for controls */
+#controls,
+#controls * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#controls button {
+  outline: none;
+}
+
+#controls button:focus {
+  outline: none;
+}
+
+/* Larger play button in the middle */
+#controls #play-toggle {
+  width: 104px;
+  height: 104px;
+}
+
+#controls #play-toggle #play-icon {
+  width: 78px;
+}
