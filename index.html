@@ -6,14 +6,23 @@
 
   </head>
   <body>
-    <div id="drag-region"></div>
+    <button id="source-button" type="button" aria-label="Source Button">
+      <img id="source-icon" alt="Source Button" />
+      <span id="source-text">select source</span>
+    </button>
+    <div id="file-list-container">
+      <div id="file-list"></div>
+    </div>
     <div id="controls">
+      
       <button id="rewind" type="button" aria-label="Rewind">
         <img id="rewind-icon" alt="Rewind Button" />
       </button>
+      
       <button id="play-toggle" type="button" aria-label="Play">
         <img id="play-icon" alt="Play Button" />
       </button>
+
       <button id="forward" type="button" aria-label="Fast Forward">
         <img id="forward-icon" alt="Fast Forward Button" />
       </button>

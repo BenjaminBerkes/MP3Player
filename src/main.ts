@@ -1,5 +1,6 @@
-import { app, BrowserWindow, Menu } from 'electron';
+import { app, BrowserWindow, Menu, ipcMain, dialog } from 'electron';
 import path from 'node:path';
+import { promises as fs } from 'node:fs';
 import started from 'electron-squirrel-startup';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -12,10 +13,9 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 360,
     height: 650,
-    resizable: false,
+    resizable: true,
     maximizable: false,
     fullscreenable: false,
-    frame: false,
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -60,3 +60,40 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+// IPC handler for selecting a directory
+ipcMain.handle('select-directory', async (event) => {
+  const mainWindow = BrowserWindow.getAllWindows()[0];
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory'],
+  });
+  
+  if (!result.canceled && result.filePaths.length > 0) {
+    return result.filePaths[0];
+  }
+  return null;
+});
+// IPC handler for finding MP3 files in a directory
+ipcMain.handle('find-mp3-files', async (event, dirPath: string) => {
+  try {
+    const files = await fs.readdir(dirPath);
+    const mp3Files = files.filter(
+      (file) => file.toLowerCase().endsWith('.mp3')
+    );
+    return mp3Files.sort();
+  } catch (error) {
+    console.error('Error reading directory:', error);
+    return [];
+  }
+});
+
+// IPC handler for reading MP3 files
+ipcMain.handle('read-mp3-file', async (event, filePath: string) => {
+  try {
+    const fileData = await fs.readFile(filePath);
+    return fileData.toString('base64');
+  } catch (error) {
+    console.error('Error reading MP3 file:', error);
+    return null;
+  }
+});

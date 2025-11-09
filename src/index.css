@@ -13,18 +13,90 @@ body {
   padding: 0;
   height: 100vh;
   box-sizing: border-box;
-  padding-top: 40px;
 }
 
-#drag-region {
-  -webkit-app-region: drag;
+#source-button {
   position: fixed;
-  top: 0;
+  top: 25px;
+  left: 8px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  width: 120px;
+  height: 50px;
+  position: relative;
+  z-index: 2;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+#source-button:focus {
+  outline: none;
+}
+
+#file-list-container {
+  position: fixed;
+  top: 90px;
   left: 0;
   right: 0;
-  height: 40px;
-  width: 100%;
+  bottom: 120px;
+  overflow-y: auto;
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
   z-index: 1;
+}
+
+#file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.file-item {
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 13px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background-color 0.15s ease;
+}
+
+.file-item.active {
+  background-color: #00FF95;
+  color: #000;
+  font-weight: 600;
+}
+
+#source-icon {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 120px;
+  height: auto;
+  -webkit-user-drag: none;
+}
+
+#source-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  font-weight: 600;
+  color: #000;
+  white-space: nowrap;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 #controls {
