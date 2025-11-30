@@ -37,6 +37,8 @@ import pauseSvg from './assets/ui/PauseButton.svg';
 import pausePressedSvg from './assets/ui/PauseButtonPressed.svg';
 import sourceButtonSvg from './assets/ui/WideButtonReleased.svg';
 import sourceButtonPressedSvg from './assets/ui/WideButtonPressed.svg';
+import volumeTrackSvg from './assets/ui/VolumeSliderTrack.svg';
+import volumeThumbSvg from './assets/ui/VolumeSliderThumb.svg';
 import pressSoundUrl from './assets/sounds/ButtonPress.wav';
 import releaseSoundUrl from './assets/sounds/ButtonRelease.wav';
 
@@ -66,6 +68,11 @@ const initAudioPlayer = () => {
   if (!musicAudio) {
     musicAudio = new Audio();
     musicAudio.preload = 'metadata';
+    // Set initial volume from slider
+    const volumeSlider = document.getElementById('volume-slider') as HTMLInputElement | null;
+    if (volumeSlider) {
+      musicAudio.volume = parseInt(volumeSlider.value) / 100;
+    }
   }
 };
 
@@ -132,9 +139,20 @@ if (playToggle && playIcon) {
       return;
     }
 
-    if (!isPlaying && mp3FilesList.length > 0) {
-      // Start playing the first song
-      initAudioPlayer();
+    initAudioPlayer();
+    
+    // Check if we have a loaded audio file
+    if (musicAudio && musicAudio.src) {
+      // Audio is already loaded, just toggle play/pause
+      if (musicAudio.paused) {
+        void musicAudio.play().catch(() => {});
+        isPlaying = true;
+      } else {
+        musicAudio.pause();
+        isPlaying = false;
+      }
+    } else if (!isPlaying && mp3FilesList.length > 0) {
+      // No file loaded yet, load and play the first song
       if (musicAudio && musicSourcePath) {
         const filePath = `${musicSourcePath}/${mp3FilesList[currentTrackIndex]}`;
         // Read file as base64 and create blob URL
@@ -151,16 +169,6 @@ if (playToggle && playIcon) {
           void musicAudio.play().catch(() => {});
           isPlaying = true;
         }
-      }
-    } else if (isPlaying) {
-      // Toggle pause/play
-      if (musicAudio) {
-        if (musicAudio.paused) {
-          void musicAudio.play().catch(() => {});
-        } else {
-          musicAudio.pause();
-        }
-        isPlaying = !musicAudio.paused;
       }
     }
     setUpIcon();
@@ -549,3 +557,61 @@ if (savedSource) {
 }
 
 wireMomentaryButton(sourceBtn, sourceIcon, sourceButtonSvg, sourceButtonPressedSvg);
+
+// Volume Slider Setup
+const volumeTrack = document.getElementById('volume-track') as HTMLImageElement | null;
+const volumeThumb = document.getElementById('volume-thumb') as HTMLImageElement | null;
+const volumeSlider = document.getElementById('volume-slider') as HTMLInputElement | null;
+
+if (volumeTrack) {
+  volumeTrack.src = volumeTrackSvg;
+}
+if (volumeThumb) {
+  volumeThumb.src = volumeThumbSvg;
+}
+
+// Update thumb position based on slider value
+const updateVolumeThumbPosition = () => {
+  if (!volumeSlider || !volumeThumb) return;
+  
+  const value = parseInt(volumeSlider.value);
+  const percentage = value / 100;
+  
+  // Calculate thumb position (accounting for thumb width and edge padding)
+  const sliderWidth = volumeSlider.offsetWidth;
+  const thumbWidth = 24;
+  const edgePadding = 4; // Pixels of padding from each edge
+  const availableWidth = sliderWidth - thumbWidth - (edgePadding * 2);
+  const thumbPosition = (availableWidth * percentage) + (thumbWidth / 2) + edgePadding;
+  
+  volumeThumb.style.left = `${thumbPosition}px`;
+};
+
+// Set initial thumb position
+if (volumeSlider) {
+  // Load saved volume from localStorage
+  const savedVolume = localStorage.getItem('musicVolume');
+  if (savedVolume) {
+    volumeSlider.value = savedVolume;
+  }
+  
+  updateVolumeThumbPosition();
+  
+  // Update music volume when slider changes
+  volumeSlider.addEventListener('input', () => {
+    updateVolumeThumbPosition();
+    
+    const volume = parseInt(volumeSlider.value) / 100;
+    
+    // Only affect music audio, not button sounds
+    if (musicAudio) {
+      musicAudio.volume = volume;
+    }
+    
+    // Save volume preference
+    localStorage.setItem('musicVolume', volumeSlider.value);
+  });
+  
+  // Update thumb position on window resize
+  window.addEventListener('resize', updateVolumeThumbPosition);
+}
